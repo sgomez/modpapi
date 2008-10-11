@@ -1,0 +1,1 @@
+LoadModule papi_module /usr/lib/apache2/modules/mod_papi.so

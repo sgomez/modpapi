@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "configure" ]; then
+        if [ -z "$2" ]; then
+                if [ -x /usr/sbin/a2enmod ]; then
+                        /usr/sbin/a2enmod xmlrpc || true
+                fi
+        fi
+fi
+
+#DEBHELPER#
+
+exit 0
+

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+	deconfigure|remove)
+		if [ -x /usr/sbin/a2dismod ]; then
+			/usr/sbin/a2dismod xmlrpc || true
+		fi  
+	;;
+esac
+
+#DEBHELPER#
+
+exit 0
+

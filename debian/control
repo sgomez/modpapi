@@ -1,0 +1,17 @@
+Source: libapache2-mod-papi
+Section: web
+Priority: optional
+Maintainer: Sergio Gomez <sergio@uco.es>
+Build-Depends: debhelper (>> 4.0.0), apache2-prefork-dev (>= 2.0), libmcrypt-dev, libcurl4-dev, libssl-dev, libglib2.0-dev, cmake, cdbs
+Standards-Version: 3.7.0
+
+Package: libapache2-mod-papi
+Architecture: any
+Depends: apache2.2-common, ${shlibs:Depends}
+Description: PAPI support for apache2
+ This is an apache2 module for PAPI
+ .
+ This module only works on Apache 2.0.x servers.
+ .
+ You can find more information about PAPI at http://papi.rediris.es.
+

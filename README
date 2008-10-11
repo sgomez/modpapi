@@ -1,0 +1,79 @@
+mod_papi in C has some changes from the Perl version.
+
+1. Parameters
+
+Only the next tags have been implemented, and theirs names have changed:
+
+Old tag					                  New tag
+---------------------------------------------------------
+HKEY_File                                 Not implemented
+LKEY_File                                 PAPILkey (1)
+Service_ID                                PAPIServiceID
+Accept_File                               PAPIAcceptFile
+Reject_File                               PAPIRejectFile
+Pubkeys_Path                              PAPIPubkeysPath
+Domain                                    PAPIDomain
+Auth_Location                             PAPIAuthLocation
+Signoff_Location                          PAPISignoffLocation
+Pass_URL_Pattern                          PAPIPassURLPattern
+Lcook_Timeout                             PAPILcookTimeout
+CRC_Timeout                               Not implemented
+URL_Timeout                               PAPIURLTimeout
+Max_TTL                                   PAPIMaxTTL
+PAPI_AS                                   PAPIAS
+PAPI_Filter                               PAPIFilter
+Cookie_Reject                             PAPICookieReject
+Hash_User_Data                            PAPIHashUserData
+User_Data_Rewrite                         PAPIUserDataRewrite
+Client_Address_In_Tokens                  PAPIClienteAddressInTokens
+Attribute_Separator                       PAPIAttributeSeparator
+Value_Separator                           PAPIValueSeparator
+Max_Nonce_Errors                          Not implemented
+Debug                                     Not implemented
+PADATH_LAA_Handler                        Not implemented
+PADATH_HDD_Handler                        Not implemented
+PADATH_Institution_ID                     Not implemented
+PADATH_Key                                Not implemented
+PADATH_Permission_Set_Attribute           Not implemented
+PADATH_User_Id_Attribute                  Not implemented
+PADATH_AAP_TTL                            Not implemented
+SPOCP_Server                              Not implemented
+SPOCP_Action                              Not implemented
+SPOCP_Accept_If_Down                      Not implemented
+GPoA_URL                                  PAPIGPoAURL
+Req_DB                                    PAPIReqDB
+GPoA_Priv_Key                             PAPIGPoAPrivKey
+GPoA_Rewrite                              PAPIRewrite
+GPoA_Hash_User_Data                       PAPIHashUserData
+Remote_URL                                Not implemented
+Remote_Domain                             Not implemented
+Local_IP_Address                          Not implemented
+Proxy_Server                              Not implemented
+No_XML                                    Not implemented
+Rewrite_MIME_Types                        Not implemented
+HTTP_Auth                                 Not implemented
+Form_Processor                            Not implemented
+PAPI_Redirect                             Not implemented
+PAPI_Redirect_by_URL                      Not implemented
+PAPI_POST_Redirect                        Not implemented
+PAPI_Header_Redirect                      Not implemented
+Rewrite_URL_Pattern                       Not implemented
+Reject_URL_Pattern                        Not implemented
+Eval_Proxy_Redirects                      Not implemented
+Proxy_Chunk_Size                          Not implemented
+Redirect_All                              Not implemented
+
+PAPI_Main and PAPI_Local are not longer necessary. You can use the tags
+in the Server or Location sections of your config file.
+
+(1) PAPILkey recives a key as parameter and not a file. If you don't configure
+    it, mod_papi will generate one automatically every time you restart apache.
+
+New tags
+
+PAPIReqDBPath
+PAPIKeysPath
+PAPIWAYF
+PAPIRemoteUserAttribute
+PAPILazySession
+

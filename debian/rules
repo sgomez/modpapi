@@ -1,0 +1,16 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+#include /usr/share/cdbs/1/rules/simple-patchsys.mk
+include /usr/share/cdbs/1/class/autotools.mk
+
+DEB_BUILDDIR := .
+DEB_CONFIGURE_SCRIPT := $(DEB_SRCDIR)/CMakeLists.txt
+DEB_CONFIGURE_INVOKE = cd $(DEB_BUILDDIR) && cmake -DCMAKE_INSTALL_PREFIX:PATH=$(DEB_DESTDIR)
+DEB_MAKE_BUILD_TARGET := VERBOSE=1
+
+#cleanbuilddir::
+#	rm -rf $(DEB_BUILDDIR)
+
+install/libapache2-mod-papi::
+	install -m644 $(CURDIR)/debian/papi.load $(DEB_DESTDIR)/etc/apache2/mods-available/papi.load
