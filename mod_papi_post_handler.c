@@ -43,7 +43,7 @@ int papi_post_handler (request_rec *r, papi_dir_config *d, const char *post)
 		apr_table_entry_t *entry = ((apr_table_entry_t *)headers_in->elts)+i;
 		char *header;
 		if (!strcmp (entry->key, "Content-Length")) {
-			header = apr_psprintf (r->pool, "Content-Length: %d", strlen(post));
+			header = apr_psprintf (r->pool, "Content-Length: %d", (int)strlen(post));
 		} else {
 			header = apr_pstrcat (r->pool, entry->key, ": ", entry->val, NULL);
 		}

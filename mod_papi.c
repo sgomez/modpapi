@@ -48,6 +48,7 @@ static void* create_papi_dir_config (apr_pool_t* pool, char *loc) {
 	dir->signoff_location = DEFAULT_ARRAY_TYPE (signoff_location_t);
 	dir->pass_url_pattern = DEFAULT_ARRAY_TYPE (pass_url_pattern_t);
 	dir->lcook_timeout = UNSET;
+	dir->lcook_max_timeout = UNSET;
 	dir->url_timeout = UNSET;
 	dir->max_ttl = UNSET;
 	dir->papi_as = DEFAULT_ARRAY_TYPE (papi_as_t);
@@ -98,6 +99,7 @@ static void* create_papi_merge_dir_config (apr_pool_t* pool, void* _base, void* 
 	cfgMergeArray (signoff_location);
 	cfgMergeArray (pass_url_pattern);
 	cfgMergeInt (lcook_timeout);
+	cfgMergeInt (lcook_max_timeout);
 	cfgMergeInt (url_timeout);
 	cfgMergeInt (max_ttl);
 	cfgMergeArray (papi_as);
@@ -223,7 +225,7 @@ static int papi_auth_hook (request_rec *r)
 			return HTTP_FORBIDDEN;
 		}
 		
-		char *lcook = papi_gen_lcook (r, d, code);
+		char *lcook = papi_gen_lcook (r, d, (int)time(NULL), code);
 		apr_table_add (r->err_headers_out, "Set-Cookie", lcook);
 		APACHE_LOG (APLOG_DEBUG, "New Lcook: %s", lcook);
 		
@@ -270,7 +272,8 @@ static int papi_auth_hook (request_rec *r)
 	} else { // Normal request
 		APACHE_LOG (APLOG_DEBUG, "Processing request %s", r->uri);
 		
-		code = papi_test_lcook (r, d);
+		int init = UNSET;
+		code = papi_test_lcook (r, d, &init);
 		if (code == NULL) {
 			if (d->lazy_session) {
 				return OK;
@@ -283,7 +286,7 @@ static int papi_auth_hook (request_rec *r)
 			}
 		} else {
 			apr_table_add (r->err_headers_out, "Set-Cookie", 
-						   papi_gen_lcook (r, d, code));
+						   papi_gen_lcook (r, d, init, code));
 			APACHE_LOG (APLOG_DEBUG, "Lcook OK: %s", code);
 		}
 	}
@@ -415,6 +418,14 @@ static command_rec papi_cmds [] =
 				  RSRC_CONF | OR_AUTHCFG,
 				  "PAPILcookTimeout seconds: Period of time during which Lcook "
 				  "tokens are valid."
+				  ),
+	AP_INIT_TAKE1(
+				  "PAPILcookMaxTimeout",
+				  ap_set_int_slot,
+				  (void *) APR_OFFSETOF (papi_dir_config, lcook_timeout),
+				  RSRC_CONF | OR_AUTHCFG,
+				  "PAPILcookMaxTimeout seconds: Period of time during which Lcook "
+				  "can be renewed."
 				  ),
 	AP_INIT_TAKE1(
 				  "PAPIURLTimeout",

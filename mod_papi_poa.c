@@ -401,20 +401,22 @@ char* papi_pub_keyfile (request_rec *r, papi_dir_config *d, const char *as) {
  * @return       the cookie
  */
 
-char* papi_gen_lcook (request_rec* r, papi_dir_config* d, const char* code) {
+char* papi_gen_lcook (request_rec* r, papi_dir_config* d, int init, const char* code) {
 	
 	papi_return_val_if_fail (code, NULL);
 	
 	char *aes_in = NULL;
 	if (d->client_address_in_tokens) {
-		aes_in = apr_psprintf (r->pool, "abcd:%d:%s:%s:%s%%%s%%",
+		aes_in = apr_psprintf (r->pool, "%d:%d:%s:%s:%s%%%s%%",
+							   init,
 							   (int)time(NULL),
 							   d->loc,
 							   d->service_id,
 							   code,
 							   r->connection->remote_ip);
 	} else {
-		aes_in = apr_psprintf (r->pool, "abcd:%d:%s:%s:%s",
+		aes_in = apr_psprintf (r->pool, "%d:%d:%s:%s:%s",
+                               init,
 							   (int)time(NULL),
 							   d->loc,
 							   d->service_id,
@@ -440,7 +442,7 @@ char* papi_gen_lcook (request_rec* r, papi_dir_config* d, const char* code) {
  * @return       the assertion
  */
 
-char* papi_test_lcook (request_rec* r, papi_dir_config* d) {
+char* papi_test_lcook (request_rec* r, papi_dir_config* d, int *init) {
 
 	char *lcook = papi_request_get_cookie (r->pool, r->headers_in, "Lcook");
 	
@@ -466,6 +468,7 @@ char* papi_test_lcook (request_rec* r, papi_dir_config* d) {
 		return NULL;
 	}
 	
+	*init = (int)apr_atoi64 (re[1]);
 	if (apr_strnatcmp (re[2], d->loc) != 0) {
 		APACHE_LOG (APLOG_WARNING, "Location parameter of Lcook is not valid. "
 					   "Loc of Lcook (%s), Loc of PoA (%s)",
@@ -479,8 +482,14 @@ char* papi_test_lcook (request_rec* r, papi_dir_config* d) {
 					   re[3], d->service_id);
 		return NULL;
 	}
-	
-	if ((int)apr_atoi64 (re[1]) + d->lcook_timeout < time (NULL)) {
+
+	if ((int)apr_atoi64(re[0]) + d->lcook_max_timeout < time (NULL)) {
+		APACHE_LOG (APLOG_WARNING, "Lcook MaxTime expired for %s",
+					   re[4]);
+		return NULL;
+	}	
+
+	if (*init + d->lcook_timeout < time (NULL)) {
 		APACHE_LOG (APLOG_WARNING, "Lcook expired for %s",
 					   re[4]);
 		return NULL;
@@ -509,7 +518,6 @@ char* papi_test_lcook (request_rec* r, papi_dir_config* d) {
 			return NULL;
 		}
 	}
-	
 	
 	return code;			
 }

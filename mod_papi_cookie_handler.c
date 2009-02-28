@@ -41,7 +41,8 @@ int papi_cookie_handler (request_rec *r, papi_dir_config *d)
 
 static int papi_cookie_test (request_rec *r, papi_dir_config *d)
 {
-	char *lcook = papi_test_lcook (r, d);
+	int  init  = UNSET; 
+	char *lcook = papi_test_lcook (r, d, &init);
 	char *aurl  = papi_uri_get_arg (r->pool, r->args, "AURL");
 	char *rurl  = papi_uri_get_arg (r->pool, r->args, "RURL");
 
@@ -73,7 +74,8 @@ static int papi_cookie_login (request_rec *r, papi_dir_config *d)
 		else
 			return papi_send_file (r, d->reject_file);
 	}
-	char *lcook = papi_gen_lcook (r, d, code);
+
+	char *lcook = papi_gen_lcook (r, d, (int)time(NULL), code);
 
 	if (aurl)
 		return papi_redirect_with_cookies (r, aurl, lcook);
@@ -83,7 +85,8 @@ static int papi_cookie_login (request_rec *r, papi_dir_config *d)
 
 static int papi_cookie_logout (request_rec *r, papi_dir_config *d)
 {
-	char *lcook = papi_test_lcook (r, d);
+	int   init  = UNSET; 
+	char *lcook = papi_test_lcook (r, d, &init);
 	char *aurl  = papi_uri_get_arg (r->pool, r->args, "AURL");
 	char *rurl  = papi_uri_get_arg (r->pool, r->args, "RURL");
 
@@ -105,7 +108,8 @@ static int papi_cookie_logout (request_rec *r, papi_dir_config *d)
 
 static int papi_cookie_check (request_rec *r, papi_dir_config *d)
 {
-	char *lcook = papi_test_lcook (r, d);
+	int   init  = UNSET; 
+	char *lcook = papi_test_lcook (r, d, &init);
 	char *url   = papi_uri_get_arg (r->pool, r->args, "URL");
 	char *data  = papi_uri_get_arg (r->pool, r->args, "DATA");
 
@@ -126,7 +130,7 @@ static int papi_cookie_check (request_rec *r, papi_dir_config *d)
 	char *rdata = papi_encrypt_gen_code (r, d, userdata, gpoa_vdate, data);
 	url = papi_uri_add_arg (r->pool, url, "ACTION", "CHECKED");
 	url = papi_uri_add_arg (r->pool, url, "DATA", rdata);
-	lcook = papi_gen_lcook (r, d, lcook);
+	lcook = papi_gen_lcook (r, d, init, lcook);
 	APACHE_LOG (APLOG_DEBUG, "Main: New Lcook: %s", lcook);
 	
 	return papi_redirect_with_cookies (r, url, lcook);
@@ -166,7 +170,7 @@ static int papi_cookie_checked (request_rec *r, papi_dir_config *d)
 	url = papi_uri_add_arg (r->pool, url, "DATA", rdata);
 	
 	if (valid_date > 1) {
-		char *lcook = papi_gen_lcook (r, d, code);
+		char *lcook = papi_gen_lcook (r, d, (int)time(NULL), code);
 		APACHE_LOG (APLOG_DEBUG, "(%s:%d) New Lcook: %s", 
 					 __FILE__, __LINE__, lcook);
 		return papi_redirect_with_cookies (r, url, lcook);

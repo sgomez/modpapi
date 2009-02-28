@@ -76,4 +76,5 @@ PAPIKeysPath
 PAPIWAYF
 PAPIRemoteUserAttribute
 PAPILazySession
+PAPILcookMaxTimeout
 

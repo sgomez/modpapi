@@ -79,6 +79,7 @@
 #define DEFAULT_AUTH_LOCATION		"/PAPI/cookie_handler.cgi"
 #define DEFAULT_WAYF				"built-in"
 #define DEFAULT_LCOOK_TIMEOUT		3600
+#define DEFAULT_LCOOK_MAX_TIMEOUT	3600
 #define DEFAULT_URL_TIMEOUT			3600
 #define DEFAULT_HASH_USER_DATA		FALSE
 #define DEFAULT_CLIENT_ADDR_TOKEN	FALSE
@@ -160,6 +161,7 @@ typedef struct {
 	apr_array_header_t *signoff_location;
 	apr_array_header_t *pass_url_pattern;
 	int lcook_timeout;
+	int lcook_max_timeout;
 	int url_timeout;
 	int max_ttl;
 	apr_array_header_t *papi_as;
@@ -222,8 +224,8 @@ void papi_build_attrList (request_rec *r, papi_dir_config *d, char *assert);
 char* papi_test_url (request_rec *r, papi_dir_config *d, int *valid_data);
 char* papi_test_gpoa_url (request_rec *r, papi_dir_config *d, char **code, int *valid_date);
 char* papi_pub_keyfile (request_rec *r, papi_dir_config *d, const char *as);
-char* papi_gen_lcook (request_rec* r, papi_dir_config* d, const char* code);
-char* papi_test_lcook (request_rec* r, papi_dir_config* d);
+char* papi_gen_lcook (request_rec* r, papi_dir_config* d, int init, const char* code);
+char* papi_test_lcook (request_rec* r, papi_dir_config* d, int *init);
 char* papi_gen_logout_lcook_cookie (request_rec *r, papi_dir_config *d);
 poa_request_t *papi_load_request (request_rec* r, papi_dir_config *d, char* request_id);
 char* papi_save_request (request_rec* r, papi_dir_config *d);

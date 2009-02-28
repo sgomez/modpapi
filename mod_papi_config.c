@@ -41,6 +41,7 @@ const char* papi_set_parameters (request_rec *r,
 	SET_DEFAULT_IF_NULL  (d->domain, DEFAULT_DOMAIN);
 	SET_DEFAULT_IF_NULL  (d->auth_location, DEFAULT_AUTH_LOCATION);
 	SET_DEFAULT_IF_UNSET (d->lcook_timeout, DEFAULT_LCOOK_TIMEOUT);
+	SET_DEFAULT_IF_UNSET (d->lcook_max_timeout, DEFAULT_LCOOK_MAX_TIMEOUT);
 	SET_DEFAULT_IF_UNSET (d->url_timeout, DEFAULT_URL_TIMEOUT);
 	SET_DEFAULT_IF_UNSET (d->hash_user_data, DEFAULT_HASH_USER_DATA);
 	SET_DEFAULT_IF_UNSET (d->client_address_in_tokens, DEFAULT_CLIENT_ADDR_TOKEN);
