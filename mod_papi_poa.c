@@ -384,7 +384,7 @@ char* papi_test_gpoa_url (request_rec *r, papi_dir_config *d, char **code, int *
  *
  * @param r      the request
  * @param d      the configuration of the PoA/GPoA
- * @param as     the as name
+ * @param as     the AS name
  * @return       the keyfile path
  */
 
@@ -392,7 +392,21 @@ char* papi_pub_keyfile (request_rec *r, papi_dir_config *d, const char *as) {
 
 	papi_return_val_if_fail (as, NULL);
 	
-	return apr_pstrcat (r->pool, d->pubkeys_path, as, "_pubkey.pem", NULL);
+	return apr_pstrcat (r->pool, d->keys_path, as, "_pubkey.pem", NULL);
+}
+
+/**
+ * Return the GPoA keyfile path.
+ *
+ * @param r      the request
+ * @param d      the configuration of the PoA/GPoA
+ * @param as     the id name
+ * @return       the keyfile path
+ */
+
+char* papi_priv_keyfile (apr_pool_t *p, papi_dir_config *d, const char *as) {
+
+	return apr_pstrcat (p, d->keys_path, as, "_privkey.pem", NULL);
 }
 
 /**

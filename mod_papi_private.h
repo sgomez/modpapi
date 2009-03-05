@@ -154,7 +154,6 @@ typedef struct {
 	char* service_id;
 	const char* accept_file;
 	const char* reject_file;
-	const char* pubkeys_path;
 	const char* keys_path;
 	char* domain;
 	char* auth_location;
@@ -174,7 +173,7 @@ typedef struct {
 	char *remote_user_attrib;
 	char attribute_separator;
 	char value_separator;
-	char* gpoa_url;
+	const char* gpoa_url;
 	char* req_db;
 	const char* req_dir;
 	char* gpoa_privkey;
@@ -194,6 +193,7 @@ const char* papi_set_papi_filter_slot (cmd_parms *parms, void *config, const cha
 const char* papi_set_cookie_reject_slot (cmd_parms *parms, void *config, const char *re);
 const char* papi_set_user_data_rewrite_slot (cmd_parms *parms, void *config, const char *re, const char *rs);
 const char* papi_set_papi_as_slot (cmd_parms *parms, void *config, const char *args);
+const char* papi_set_gpoa_url_slot (cmd_parms *parms, void *config, const char *id, const char *url);
 const char* papi_set_attribute_slot (cmd_parms *parms, void *config, const char *separator);
 const char* papi_set_value_slot (cmd_parms *parms, void *config, const char *separator);
 const char* papi_set_gpoa_rewrite_slot (cmd_parms *parms, void *config, const char *poa_re, const char *re, const char *rs);
@@ -224,6 +224,7 @@ const char* papi_build_attrList (request_rec *r, papi_dir_config *d, char *asser
 char* papi_test_url (request_rec *r, papi_dir_config *d, int *valid_data);
 char* papi_test_gpoa_url (request_rec *r, papi_dir_config *d, char **code, int *valid_date);
 char* papi_pub_keyfile (request_rec *r, papi_dir_config *d, const char *as);
+char* papi_priv_keyfile (apr_pool_t *p, papi_dir_config *d, const char *as);
 char* papi_gen_lcook (request_rec* r, papi_dir_config* d, int init, const char* code);
 char* papi_test_lcook (request_rec* r, papi_dir_config* d, int *init);
 char* papi_gen_logout_lcook_cookie (request_rec *r, papi_dir_config *d);
