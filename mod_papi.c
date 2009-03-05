@@ -306,9 +306,20 @@ static int papi_auth_hook (request_rec *r)
 		
 	}
 
+	const char *asid;
 	// Pass user attribute information
 	if (d->attribute_list->nelts == 0) {
-		papi_build_attrList (r, d, code);
+		asid = papi_build_attrList (r, d, code);
+		if (asid != NULL) {
+			apr_table_add (r->notes,
+						   apr_pstrdup (r->pool,
+										"PAPI-ASID"),
+						   asid);
+			apr_table_add (r->headers_in,
+						   apr_pstrdup (r->pool,
+										"X-PAPI-ASID"),
+						   asid);
+		}
 	}
 	
 	for (i=0; i < d->attribute_list->nelts; i++) {

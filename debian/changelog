@@ -1,3 +1,11 @@
+libapache2-mod-papi (0.0.2-1) unstable; urgency=low
+
+  * New release
+  * PAPILCookMaxTimeout added
+  * Bug fixed: GPoA/AS ID in assert not should be added to the last attribute.
+
+ -- Sergio Gomez <sergio@uco.es>  Tue, 5 Mar 2009 09:21:12 +0200
+
 libapache2-mod-papi (0.0.1-1) unstable; urgency=low
 
   * Init release.

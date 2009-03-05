@@ -82,9 +82,6 @@ static int papi_test_filters (request_rec *r, papi_dir_config *d, char* assert)
 {
 	papi_return_val_if_fail(assert, 1);
 	
-	// Build the attribute list
-	papi_build_attrList (r, d, assert);
-	
 	// PAPI_Filter directives are evaluated first
 	int i;
 	for (i=0; i < d->papi_filter->nelts; i++) {
@@ -107,15 +104,18 @@ static int papi_test_filters (request_rec *r, papi_dir_config *d, char* assert)
  * @param r      the request
  * @param d      the configuration of the PoA/GPoA
  * @param assert the assertion send by the AS
+ * @return       the asid (id from AS)
  */
 
-void papi_build_attrList (request_rec *r, papi_dir_config *d, char *assert)
+const char *papi_build_attrList (request_rec *r, papi_dir_config *d, char *assert)
 {
 	papi_return_if_fail (assert);
 	
 	const char *pair;
-	const char *src = apr_pstrdup (r->pool, assert);
-	
+	const char *ptr = strrchr (assert, '@');
+	const char *asid = apr_pstrdup (r->pool, ptr+1);
+	const char *src = apr_pstrndup (r->pool, assert, ptr-assert);
+
 	while (*src && (pair = ap_getword (r->pool, &src, d->attribute_separator))) {
 		const char *name;
 		attribute_t *attr;
@@ -125,6 +125,8 @@ void papi_build_attrList (request_rec *r, papi_dir_config *d, char *assert)
 		attr->key = papi_unescape_string (r->pool, name);
 		attr->value = papi_unescape_string (r->pool, pair);
 	}
+	
+	return asid;
 }
 
 /**

@@ -220,7 +220,7 @@ char **papi_string_split (apr_pool_t *p, char *string, char *token, int limit);
 
 // mod_papi_poa
 
-void papi_build_attrList (request_rec *r, papi_dir_config *d, char *assert);
+const char* papi_build_attrList (request_rec *r, papi_dir_config *d, char *assert);
 char* papi_test_url (request_rec *r, papi_dir_config *d, int *valid_data);
 char* papi_test_gpoa_url (request_rec *r, papi_dir_config *d, char **code, int *valid_date);
 char* papi_pub_keyfile (request_rec *r, papi_dir_config *d, const char *as);
