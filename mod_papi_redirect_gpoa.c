@@ -88,6 +88,23 @@ int papi_redirect_gpoa (request_rec *r, papi_dir_config *d)
 	
 	if (d->lazy_session) {
 		poa_uri = papi_uri_get_arg (r->pool, r->args, "target");
+                if (poa_uri == NULL) {
+                    APACHE_LOG (APLOG_ERR, "No target in lazy session");
+                    return 1;
+                }
+                char *ptr = strstr(r->uri, d->auth_location);
+                if (ptr) *ptr='\0';
+                char *src = ptr;
+                if (strncmp (r->args, "target=", 7) == 0) {
+                    ptr = r->args;
+                    src = strchrnul (r->args, '&');
+                    if (*src == '&') src ++;
+                } else {
+                    ptr = strstr(r->args, "&target=");
+                    src = strchrnul (ptr+1, '&');
+                }
+                memcpy (ptr, src, strlen(src)+1);
+
 	} else {
 		poa_uri = ap_construct_url (r->pool, r->unparsed_uri, r);
 	}
