@@ -68,12 +68,13 @@
                 "assertion `%s' failed",                        \
                 #expr);                                         \
          return (val);                                          \
-       }; 
+       };
 
 #ifndef UNSET
 #define UNSET (-1)
 #endif
 
+#define ARRAY(x,y)                      (((x##_t *) d->x->elts)+i)
 #define DEFAULT_ARRAY_TYPE(type)	apr_array_make (pool, 5, sizeof (type))
 #define DEFAULT_DOMAIN				r->server->server_hostname
 #define DEFAULT_AUTH_LOCATION		"/PAPI/cookie_handler.cgi"
@@ -144,7 +145,7 @@ typedef struct {
 typedef struct {
 	const char *key;
 	const char *value;
-} attribute_t;
+} attribute_list_t;
 
 typedef struct {
 	char* loc;
@@ -217,6 +218,7 @@ papi_regex_t *papi_regex_new (apr_pool_t *p, const char *pattern);
 int papi_regex_match (papi_regex_t *re, const char *string);
 char *papi_regex_replace (apr_pool_t *p, papi_regex_t *re, const char* string, const char* replace);
 char **papi_string_split (apr_pool_t *p, char *string, char *token, int limit);
+char* papi_file_stat (request_rec *r, papi_dir_config *d, const char *path, apr_filetype_e type);
 
 // mod_papi_poa
 

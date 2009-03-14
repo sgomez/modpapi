@@ -175,3 +175,26 @@ char **papi_string_split (apr_pool_t *p, char *string, char *token, int limit)
 	
 	return array;
 }
+
+char* papi_file_stat (request_rec *r, papi_dir_config *d, const char *path, apr_filetype_e type) {
+        apr_finfo_t finfo;
+        apr_status_t status;
+        
+        status = apr_stat(&finfo, path, APR_FINFO_OWNER|APR_FINFO_PROT|APR_FINFO_TYPE, r->pool);
+        papi_return_val_if_fail (status==APR_SUCCESS,
+                apr_psprintf(r->pool, "Error file %s not found in Location %s", path, d->loc));
+        papi_return_val_if_fail (finfo.filetype == type,
+                apr_psprintf(r->pool, "Error PAPI expected another type of file (%s) in Location %s", path, d->loc));
+
+        papi_return_val_if_fail (type == APR_DIR && ((finfo.user  == geteuid() && finfo.protection&S_IWUSR) ||
+                                     (finfo.group == getegid() && finfo.protection&S_IWGRP) ||
+                                     (finfo.protection&S_IWOTH)),
+                apr_psprintf(r->pool, "Error PAPI can't write on directory %s in Location %s", path, d->loc));
+
+        papi_return_val_if_fail (type == APR_REG && ((finfo.user  == geteuid() && finfo.protection&S_IRUSR) ||
+                                     (finfo.group == getegid() && finfo.protection&S_IRGRP) ||
+                                     (finfo.protection&S_IROTH)),
+                apr_psprintf(r->pool, "Error PAPI can't read file %s in Location %s", path, d->loc));
+        return NULL;
+
+}

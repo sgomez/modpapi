@@ -146,7 +146,7 @@ int papi_redirect_gpoa (request_rec *r, papi_dir_config *d)
 		for (i=0; i < d->papi_as->nelts; i++) {
 			papi_as_t *papi_as;
 			
-			papi_as = ((papi_as_t *) d->papi_as->elts)+i;
+			papi_as = ARRAY(papi_as, i);
 			
 			argstr = papi_uri_add_arg (r->pool, argstr, apr_psprintf (r->pool, "ASID%d", i), papi_as->name);
 			argstr = papi_uri_add_arg (r->pool, argstr, apr_psprintf (r->pool, "ASDESC%d", i), papi_as->description);

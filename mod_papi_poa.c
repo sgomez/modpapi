@@ -85,7 +85,7 @@ static int papi_test_filters (request_rec *r, papi_dir_config *d, char* assert)
 	// PAPI_Filter directives are evaluated first
 	int i;
 	for (i=0; i < d->papi_filter->nelts; i++) {
-		papi_filter_t *papi_filter = ((papi_filter_t *) d->papi_filter->elts)+i;
+		papi_filter_t *papi_filter = ARRAY (papi_filter, i);
 		if (papi_regex_match (papi_filter->re, assert)) {
 			APACHE_LOG (APLOG_INFO, "Filter /%s/ matches for %s: %s",
 						   papi_filter->re->pattern,
@@ -118,10 +118,10 @@ const char *papi_build_attrList (request_rec *r, papi_dir_config *d, char *asser
 
 	while (*src && (pair = ap_getword (r->pool, &src, d->attribute_separator))) {
 		const char *name;
-		attribute_t *attr;
+		attribute_list_t *attr;
 		
 		name = ap_getword (r->pool, &pair, d->value_separator);
-		attr = (attribute_t *) apr_array_push (d->attribute_list);
+		attr = (attribute_list_t *) apr_array_push (d->attribute_list);
 		attr->key = papi_unescape_string (r->pool, name);
 		attr->value = papi_unescape_string (r->pool, pair);
 	}
@@ -165,7 +165,7 @@ static int papi_test_as (request_rec *r, papi_dir_config *d, char *as)
 	
 	int i;	
 	for (i=0; i < d->papi_as->nelts; i++) {
-		papi_as_t *papi_as = ((papi_as_t *) d->papi_as->elts)+i;
+		papi_as_t *papi_as = ARRAY (papi_as, i);
 		if (apr_strnatcmp (papi_as->name, as) == 0)
 			return 1;
 	}
@@ -404,9 +404,9 @@ char* papi_pub_keyfile (request_rec *r, papi_dir_config *d, const char *as) {
  * @return       the keyfile path
  */
 
-char* papi_priv_keyfile (apr_pool_t *p, papi_dir_config *d, const char *as) {
+char* papi_priv_keyfile (apr_pool_t *p, papi_dir_config *d, const char *gpoa) {
 
-	return apr_pstrcat (p, d->keys_path, as, "_privkey.pem", NULL);
+	return apr_pstrcat (p, d->keys_path, gpoa, "_privkey.pem", NULL);
 }
 
 /**
@@ -527,7 +527,7 @@ char* papi_test_lcook (request_rec* r, papi_dir_config* d, int *init) {
 	}
 	
 	for (i=0; i < d->cookie_reject->nelts; i++) {
-		cookie_reject_t *cr = ((cookie_reject_t *) d->cookie_reject->elts)+i;
+		cookie_reject_t *cr = ARRAY (cookie_reject, i);
 		if (papi_regex_match (cr->re, key)) {
 			APACHE_LOG (APLOG_WARNING, "%s matches rejection cookie filter %s",
 						   key, cr->re->pattern);

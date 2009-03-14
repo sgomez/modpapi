@@ -1,63 +1,41 @@
 #include "mod_papi_private.h"
 
-const char* papi_set_parameters(request_rec *r,
-        papi_dir_config *d) {
-    if (!d->service_id) {
-        return "PAPIServiceID parameter is empty";
-    }
+const char* papi_set_parameters(request_rec *r, papi_dir_config *d) {
 
-    if (!d->keys_path) {
-        return "PAPIKeysPath parameters are empties";
-    }
-
-    if (!d->accept_file) {
-        return "PAPIAcceptFile parameter is empty";
-    }
-
-    if (!d->reject_file) {
-        return "PAPIRejectFile parameter is empty";
-    }
-
-    if (d->wayf && !d->gpoa_url) {
-        d->gpoa_url = apr_pstrcat(r->pool, "wayf:", d->wayf, NULL);
-    }
-
-    if (!d->req_db && d->gpoa_url) {
-        if (d->req_dir == NULL) {
-            return "PAPIReqDB and PAPIRedDBDir parameters are empties";
-        } else {
-            d->req_db = apr_pstrcat(r->pool,
-                    d->req_dir, d->service_id, ".db", NULL);
-        }
-    }
-
+    papi_return_val_if_fail (d->service_id,  "PAPIServiceID parameter is empty.");
+    papi_return_val_if_fail (d->keys_path,   "PAPIKeysPath parameter is empty.");
+    papi_return_val_if_fail (d->req_db,      "PAPIReqDBDir parameter is empty.")
+    papi_return_val_if_fail (d->accept_file, "PAPIAcceptFile parameter is empty.");
+    papi_return_val_if_fail (d->reject_file, "PAPIRejectFile parameter is empty");
+    papi_return_val_if_fail (d->wayf || d->gpoa_url,
+            apr_psprintf(r->pool, "PAPIWAYF or PAPIGPoA must be defined in %s", d->loc));
     // Configuring default parameters values
-
-    SET_DEFAULT_IF_NULL(d->domain, DEFAULT_DOMAIN);
-    SET_DEFAULT_IF_NULL(d->auth_location, DEFAULT_AUTH_LOCATION);
-    SET_DEFAULT_IF_UNSET(d->lcook_timeout, DEFAULT_LCOOK_TIMEOUT);
-    SET_DEFAULT_IF_UNSET(d->lcook_max_timeout, DEFAULT_LCOOK_MAX_TIMEOUT);
-    SET_DEFAULT_IF_UNSET(d->url_timeout, DEFAULT_URL_TIMEOUT);
-    SET_DEFAULT_IF_UNSET(d->hash_user_data, DEFAULT_HASH_USER_DATA);
-    SET_DEFAULT_IF_UNSET(d->client_address_in_tokens, DEFAULT_CLIENT_ADDR_TOKEN);
-    SET_DEFAULT_IF_UNSET(d->gpoa_hash_user_data, DEFAULT_GPOA_HASH_USER_DATA);
-    SET_DEFAULT_IF_NULL(d->remote_user_attrib, DEFAULT_REMOTE_USER_ATTRIB);
-    SET_DEFAULT_IF_UNSET(d->attribute_separator, DEFAULT_ATTRIBUTE_SEPARATOR);
-    SET_DEFAULT_IF_UNSET(d->value_separator, DEFAULT_VALUE_SEPARATOR);
-    SET_DEFAULT_IF_UNSET(d->lazy_session, DEFAULT_LAZY_SESSION);
+    SET_DEFAULT_IF_NULL  (d->domain, DEFAULT_DOMAIN);
+    SET_DEFAULT_IF_NULL  (d->auth_location, DEFAULT_AUTH_LOCATION);
+    SET_DEFAULT_IF_UNSET (d->lcook_timeout, DEFAULT_LCOOK_TIMEOUT);
+    SET_DEFAULT_IF_UNSET (d->lcook_max_timeout, DEFAULT_LCOOK_MAX_TIMEOUT);
+    SET_DEFAULT_IF_UNSET (d->url_timeout, DEFAULT_URL_TIMEOUT);
+    SET_DEFAULT_IF_UNSET (d->hash_user_data, DEFAULT_HASH_USER_DATA);
+    SET_DEFAULT_IF_UNSET (d->client_address_in_tokens, DEFAULT_CLIENT_ADDR_TOKEN);
+    SET_DEFAULT_IF_UNSET (d->gpoa_hash_user_data, DEFAULT_GPOA_HASH_USER_DATA);
+    SET_DEFAULT_IF_NULL  (d->remote_user_attrib, DEFAULT_REMOTE_USER_ATTRIB);
+    SET_DEFAULT_IF_UNSET (d->attribute_separator, DEFAULT_ATTRIBUTE_SEPARATOR);
+    SET_DEFAULT_IF_UNSET (d->value_separator, DEFAULT_VALUE_SEPARATOR);
+    SET_DEFAULT_IF_UNSET (d->lazy_session, DEFAULT_LAZY_SESSION);
 
     apr_table_add(r->notes, "PAPIid", d->service_id);
+    d->req_db = apr_pstrcat(r->pool, d->req_dir, d->service_id, ".db", NULL);
 
+    // Config AS public keys
     int i;
     for (i = 0; i < d->papi_as->nelts; i++) {
-        papi_as_t *as = ((papi_as_t *) d->papi_as->elts) + i;
-        char *path = papi_pub_keyfile(r, d, as->name);
-        apr_finfo_t finfo;
-        int status = apr_stat(&finfo, path, APR_FINFO_USER, r->pool);
-        if (status != APR_SUCCESS) {
-            return apr_pstrcat(r->pool, "could not stat public AS keyfile ", path, NULL);
-        }
+        char *path = papi_pub_keyfile(r, d, ARRAY(papi_as,i)->name);
+        char *err = papi_file_stat (r, d, path, APR_REG);
+        papi_return_val_if_fail (err==NULL,err);
     }
+    // Config GPoA private key
+
+    // Config Private
 
     return NULL;
 }
