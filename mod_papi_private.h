@@ -15,6 +15,7 @@
 #include <apr_dbd.h>
 #include <ctype.h>
 #include <curl/curl.h>
+#include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <string.h>

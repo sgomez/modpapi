@@ -1,4 +1,6 @@
 #include "mod_papi_poa.h"
+#include <sqlite3.h>
+
 
 /**
  * Split an assertion.
@@ -709,10 +711,10 @@ char* papi_save_request (request_rec* r, papi_dir_config *d) {
 	apr_dbd_t *handle = NULL;
 	apr_status_t status;
 	char *post, *key;
-	int nrows, i, now, errn;
+	int nrows, i, errn;
 	const apr_array_header_t *headers_in;
-
-	now = (int)time(NULL);
+        struct timeval nowtim;
+        
 	if (apr_dbd_init (r->pool) != APR_SUCCESS) {
 		APACHE_LOG (APLOG_ERR, "failed to init apr_dbd");
 		return NULL;
@@ -756,8 +758,7 @@ char* papi_save_request (request_rec* r, papi_dir_config *d) {
 		return NULL;
 	}
 #endif
-	key = ap_md5 (r->pool, (unsigned char*) apr_psprintf (r->pool, "%d%d", now, getpid()));
-	
+        key = ap_md5 (r->pool, (unsigned char*) apr_psprintf (r->pool, "%ld%ld%d", nowtim.tv_sec,nowtim.tv_usec, getpid()));
 #ifdef APR_DBD_SQLITE3
 	status = apr_dbd_pvquery (driver, r->pool, handle, &nrows, req_statement,
 					 key, r->method, r->uri, r->args?r->args:"", r->filename,
@@ -843,6 +844,11 @@ static apr_dbd_t *papi_dbd_open (request_rec* r, papi_dir_config *d, const apr_d
 		APACHE_LOG (APLOG_ERR, "failed to open database");
 		return NULL;
 	}
+
+/* HMR - SIUV -- DEFINE UN TIMEOUT para que no casquen instantaneamente
+las peticiones por "database locked"!! - 20 sg (la doc dice ms, pero son 50HZ)*/
+        void *sqlite3db = apr_dbd_native_handle(driver, handle);
+        sqlite3_busy_timeout(sqlite3db, 1000);
 	
 	if (!build) {
 		return handle;

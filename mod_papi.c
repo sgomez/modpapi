@@ -214,7 +214,7 @@ static int papi_auth_hook(request_rec *r) {
                 while (*data && (pair = ap_getword(r->pool, &data, '&'))) {
                     const char *name;
                     name = ap_getword(r->pool, &pair, '=');
-                    if (strcmp(name, "ACTION") && strcmp(name, "DATA")) {
+                    if (strcmp(name, "ACTION") && strcmp(name, "DATA") && strcmp(name, "AS")) {
                         url = papi_uri_add_arg(r->pool, url, name, pair);
                     }
                 }

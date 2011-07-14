@@ -83,14 +83,14 @@ int papi_read_body (request_rec *r, char **buffer)
 		for (bytes = ap_get_client_block (r, buf, MAX_SIZE); 
 			 bytes > 0;
 			 bytes = ap_get_client_block (r, buf, MAX_SIZE)) {
-				 buffer[bytes-1] = '\0';
+				 (*buffer)[bytes-1] = '\0';
 				 *buffer = apr_pstrcat (r->pool, *buffer, buf, NULL);
 				 count += bytes;
 			 }
 	} else {
 		APACHE_LOG (APLOG_WARNING, "No request body.");
 	}
-	buffer[count-1] = '\0';
+	(*buffer)[count-1] = '\0';
 
 	return OK;
 }

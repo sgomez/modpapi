@@ -118,7 +118,11 @@ int papi_redirect_gpoa (request_rec *r, papi_dir_config *d)
 		poa_server = apr_psprintf (r->pool, "%s:%d", poa_server, poa_port);
 	
 	char *key = papi_save_request (r, d);
-	
+	if (key == NULL) {
+                APACHE_LOG (APLOG_ERR, "ERROR saving request in DB");
+                return HTTP_INTERNAL_SERVER_ERROR;
+        }
+        
 	if (strncmp (d->gpoa_url, "wayf:", 5) == 0) {
 		// Using a wayf
 		char *argstr, *nexturl, *fas, *wayfurl;
